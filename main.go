@@ -242,7 +242,7 @@ func checkFirebaseVulnerability(client *http.Client, baseURL string) Result {
 	resp, err := client.Get(jsonURL)
 	if err != nil {
 		return Result{
-			URL:   baseURL,
+			URL:   jsonURL,
 			Error: err,
 		}
 	}
@@ -251,8 +251,26 @@ func checkFirebaseVulnerability(client *http.Client, baseURL string) Result {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{
-			URL:   baseURL,
+			URL:   jsonURL,
 			Error: err,
+		}
+	}
+
+	bodyStr := string(body)
+
+	if strings.HasPrefix(bodyStr, "{\n  \"error\" :") {
+		var firebaseResp FirebaseResponse
+		if err := json.Unmarshal(body, &firebaseResp); err == nil && firebaseResp.Error != "" {
+			if strings.Contains(firebaseResp.Error, "404 Not Found") {
+				return Result{
+					URL:        jsonURL,
+					Vulnerable: true,
+					VulnType:   "TAKEOVER",
+				}
+			}
+			return Result{
+				URL: jsonURL,
+			}
 		}
 	}
 
@@ -260,13 +278,13 @@ func checkFirebaseVulnerability(client *http.Client, baseURL string) Result {
 	if err := json.Unmarshal(body, &firebaseResp); err != nil {
 		if resp.StatusCode == 200 && len(body) > 0 {
 			return Result{
-				URL:        baseURL,
+				URL:        jsonURL,
 				Vulnerable: true,
 				VulnType:   "READ ACCESS",
 			}
 		}
 		return Result{
-			URL:   baseURL,
+			URL:   jsonURL,
 			Error: fmt.Errorf("could not parse response as JSON"),
 		}
 	}
@@ -274,18 +292,15 @@ func checkFirebaseVulnerability(client *http.Client, baseURL string) Result {
 	if firebaseResp.Error != "" {
 		if strings.Contains(firebaseResp.Error, "404 Not Found") {
 			return Result{
-				URL:        baseURL,
+				URL:        jsonURL,
 				Vulnerable: true,
 				VulnType:   "TAKEOVER",
 			}
 		}
-		return Result{
-			URL: baseURL,
-		}
 	}
 
 	return Result{
-		URL:        baseURL,
+		URL:        jsonURL,
 		Vulnerable: true,
 		VulnType:   "READ ACCESS",
 	}

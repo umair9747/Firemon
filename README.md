@@ -135,8 +135,8 @@ https://test4.firebaseio.com/
 
 #### Text Output
 ```
-https://test.firebaseio.com/ [VULNERABLE : TAKEOVER]
-https://example.firebaseio.com/ [VULNERABLE : READ ACCESS]
+https://test.firebaseio.com/.json [VULNERABLE : TAKEOVER]
+https://example.firebaseio.com/.json [VULNERABLE : READ ACCESS]
 ```
 
 #### JSON Output
@@ -149,17 +149,17 @@ https://example.firebaseio.com/ [VULNERABLE : READ ACCESS]
   },
   "results": [
     {
-      "url": "https://test.firebaseio.com/",
+      "url": "https://test.firebaseio.com/.json",
       "vulnerable": true,
       "vulnerability_type": "TAKEOVER"
     },
     {
-      "url": "https://example.firebaseio.com/",
+      "url": "https://example.firebaseio.com/.json",
       "vulnerable": true,
       "vulnerability_type": "READ ACCESS"
     },
     {
-      "url": "https://secure.firebaseio.com/",
+      "url": "https://secure.firebaseio.com/.json",
       "vulnerable": false
     }
   ]
@@ -172,7 +172,7 @@ https://example.firebaseio.com/ [VULNERABLE : READ ACCESS]
 Processing 3 URLs with concurrency 20
 Processing Firebase URL: https://test.firebaseio.com/users -> https://test.firebaseio.com/
 Checking: https://test.firebaseio.com/.json
-https://test.firebaseio.com/ [VULNERABLE : TAKEOVER]
+https://test.firebaseio.com/.json [VULNERABLE : TAKEOVER]
 
 Scan completed. Found 1 vulnerable endpoints out of 3 total.
 Results saved to results.txt
